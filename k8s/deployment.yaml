@@ -9,6 +9,7 @@ metadata:
     app: trustbank-fraud
     course: data789
     assignment: hw4
+    owner: nshirsat
 spec:
   replicas: 3                         # graded: exactly 3 replicas
   revisionHistoryLimit: 5
@@ -25,7 +26,7 @@ spec:
       labels:
         app: trustbank-fraud
         color: blue                    # only used by the blue-green variant (k8s/blue-green/)
-        # HW4: add  owner: <your-onyen>  here (and on the Deployment's metadata.labels above)
+        owner: nshirsat  # here (and on the Deployment's metadata.labels above)
     spec:
       containers:
         - name: fraud
@@ -36,14 +37,16 @@ spec:
               containerPort: 8000                # API listens here (Dockerfile EXPOSE 8000)
           env:
             - name: REDIS_HOST                   # the API reads customer features from Redis…
-              value: "redis"                     # …at this Service name (see k8s/redis.yaml)
+              value: "redis"     
+            - name: REDIS_PORT
+              value: "6379"                # …at this Service name (see k8s/redis.yaml)
           resources:
             requests:                             # what the scheduler reserves
               cpu: "100m"
               memory: "128Mi"
             limits:                               # hard ceiling. HW4: right-size these per the assignment
-              cpu: "500m"
-              memory: "256Mi"
+              cpu: "250m"
+              memory: "192Mi"
           # Probes hit GET /health — it returns 200 WITHOUT touching Redis, so pods
           # report Ready even before Redis is up.
           startupProbe:                           # allow a slow model-load to warm up (~150s)
